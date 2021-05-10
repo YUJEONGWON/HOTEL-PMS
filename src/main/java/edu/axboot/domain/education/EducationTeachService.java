@@ -145,7 +145,6 @@ public class EducationTeachService extends BaseService<EducationTeach, Long> {
         return entity;
     }
 
-    @Transactional
     public void saveUsingQueryDsl(EducationTeach entity) {
         if (entity.getId() == null || entity.getId() == 0) {
             this.educationTeachRepository.save(entity);
