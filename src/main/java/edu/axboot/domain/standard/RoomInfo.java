@@ -68,9 +68,9 @@ public class RoomInfo extends SimpleJpaModel<Long> {
 	}
 
 
-	public void update(String roomNum,String roomTypCd,String dndYn,String ebYn,
+	public void update(String roomTypCd,String dndYn,String ebYn,
 					   String roomSttusCd,String clnSttusCd,String svcSttusCd) {
-		this.roomNum =roomNum;
+
 		this.roomTypCd = roomTypCd;
 		this.dndYn = dndYn;
 		this.ebYn =ebYn;

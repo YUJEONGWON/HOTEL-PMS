@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import edu.axboot.controllers.dto.*;
 import edu.axboot.domain.education.EducationTeach;
 import edu.axboot.domain.education.book.EducationBook;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import edu.axboot.domain.BaseService;
 import javax.inject.Inject;
@@ -86,6 +87,7 @@ public class RoomInfoService extends BaseService<RoomInfo, Long> {
     }
     */
 
+    @Transactional(readOnly = true)
     public List<RoomInfoResponseDto> getRoomList(String roomTypcd) {
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -113,32 +115,65 @@ public class RoomInfoService extends BaseService<RoomInfo, Long> {
         return new RoomInfoResponseDto(entity);
     }
 
+
     @Transactional
-    public Long save(RoomInfoSaveDto requestDto){
-        Long id;
-        if(requestDto.toEntity().getId() == null || requestDto.toEntity().getId()==0)
-            id = roomInfoRepository.save(requestDto.toEntity()).getId();
-        else{
-            RoomInfo roomInfo = roomInfoRepository.findOne(requestDto.toEntity().getId());
-            id= roomInfo.getId();
-            if (roomInfo == null) {
-                throw new IllegalArgumentException("해당 객실이 없습니다. id=" + id);
-            }
-            roomInfo.update(requestDto.getRoomNum(),requestDto.getRoomTypCd(), requestDto.getDndYn(),
+    public Long update(Long id,RoomInfoSaveDto requestDto){
+
+        RoomInfo roomInfo = roomInfoRepository.findOne(id);
+
+        if (roomInfo == null) {
+            throw new IllegalArgumentException("해당 객실이 없습니다. id=" + id);
+        }
+        roomInfo.update(requestDto.getRoomTypCd(), requestDto.getDndYn(),
                     requestDto.getEbYn(), requestDto.getRoomSttusCd(),requestDto.getClnSttusCd(),requestDto.getSvcSttusCd());
 
-        }
         return id;
     }
 
+    @Transactional
+    public void saveRoom(List<RoomInfo> entities){
+        for(RoomInfo entity: entities){
+            saveRoom(entity);
+        }
+    }
 
+
+    @Transactional
+    public void saveRoom(RoomInfo entity) {
+        if (entity.getId() == null || entity.getId() == 0) {
+            this.roomInfoRepository.save(entity);
+        } else if (entity.isDeleted()) {
+            deleteRoom(entity.getId());
+        } else {
+            update(qRoomInfo)
+                    //.set(qRoomInfo.id, entity.getId())
+                    .set(qRoomInfo.roomNum, entity.getRoomNum())
+                    .set(qRoomInfo.roomTypCd, entity.getRoomTypCd())
+                    .set(qRoomInfo.roomSttusCd, entity.getRoomSttusCd())
+                    .set(qRoomInfo.clnSttusCd, entity.getClnSttusCd())
+                    .set(qRoomInfo.svcSttusCd,entity.getSvcSttusCd())
+                    .set(qRoomInfo.dndYn, entity.getDndYn())
+                    .set(qRoomInfo.ebYn, entity.getEbYn())
+                    .where(qRoomInfo.id.eq(entity.getId()))
+                    .execute();
+        }
+    }
 
 /*    @Transactional
-    public Long save(RoomInfoSaveDto requestDto) {
-        return roomInfoRepository.save(requestDto.toEntity()).getId();
+    public void saveRoom(List<RoomInfoSaveDto> requestDtos) {
+        for(RoomInfoSaveDto requestDto : requestDtos)
+        {
+            roomInfoRepository.save(requestDto.toEntity());
+//            saveRoom(requestDtos);
+        }
     }
 
     @Transactional
+    public void saveRoom(RoomInfoSaveDto requestDto) {
+        roomInfoRepository.save(requestDto.toEntity());
+    }*/
+
+/*    @Transactional
     public Long update(Long id, RoomInfoSaveDto requestDto) {
         RoomInfo roomInfo1 = roomInfoRepository.findOne(requestDto.toEntity().getId());
 
@@ -154,10 +189,15 @@ public class RoomInfoService extends BaseService<RoomInfo, Long> {
     @Transactional
     public void deleteRoom(List<Long> ids) {
         for (Long id : ids) {
-            delete(qRoomInfo)
-                    .where(qRoomInfo.id.eq(id))
-                    .execute();
+            deleteRoom(id);
 
         }
+    }
+
+    @Transactional
+    public void deleteRoom(Long id) {
+        delete(qRoomInfo)
+                .where(qRoomInfo.id.eq(id))
+                .execute();
     }
 }

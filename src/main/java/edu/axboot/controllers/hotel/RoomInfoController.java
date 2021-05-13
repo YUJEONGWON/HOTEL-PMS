@@ -1,4 +1,4 @@
-package edu.axboot.controllers;
+package edu.axboot.controllers.hotel;
 
 import com.chequer.axboot.core.api.response.Responses;
 import com.chequer.axboot.core.controllers.BaseController;
@@ -50,9 +50,11 @@ public class RoomInfoController extends BaseController {
         return ok();
     }*/
 
+
+
     @RequestMapping(method = RequestMethod.GET, produces = APPLICATION_JSON)
-    public List<RoomInfoResponseDto> list(@RequestBody RoomInfoResponseDto roomInfoResponseDto){
-        return roomInfoService.getRoomList(roomInfoResponseDto.getRoomTypCd());
+    public List<RoomInfoResponseDto> list(@RequestParam(required = false) String roomTypCd){
+        return roomInfoService.getRoomList(roomTypCd);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = APPLICATION_JSON)
@@ -60,9 +62,15 @@ public class RoomInfoController extends BaseController {
         return roomInfoService.getRoom(id);
     }
 
+    @RequestMapping(method = RequestMethod.PUT, produces = APPLICATION_JSON)
+    public ApiResponse save(@RequestBody List<RoomInfo> requestDto) {
+        roomInfoService.saveRoom(requestDto);
+        return ok();
+    }
+
     @RequestMapping(method = RequestMethod.POST, produces = APPLICATION_JSON)
-    public ApiResponse save(@RequestBody RoomInfoSaveDto requestDto) {
-        roomInfoService.save(requestDto);
+    public ApiResponse update(@RequestBody RoomInfoSaveDto requestDto) {
+        roomInfoService.update(requestDto.getId(),requestDto);
         return ok();
     }
 

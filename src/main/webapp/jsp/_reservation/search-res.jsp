@@ -8,7 +8,7 @@
 
 <ax:layout name="base">
     <jsp:attribute name="script">
-        <script type="text/javascript" src="<c:url value='/assets/js/view/_standard/room-info.js' />"></script>
+        <script type="text/javascript" src="<c:url value='/assets/js/view/_reservation/search-res.js' />"></script>
     </jsp:attribute>
     <jsp:body>
 
@@ -19,9 +19,14 @@
             <ax:form name="searchView0">
                 <ax:tbl clazz="ax-search-tbl" minWidth="500px">
                     <ax:tr>
-                        <ax:td label='객실타입' width="300px">
-                            <ax:common-code groupCd="ROOM_TYPE" clazz="js-roomTypCd" emptyText="전체"/>
-                            
+                        <ax:td label='검색조건' width="300px">
+                            <input type="text" class="form-control" />
+                        </ax:td>
+                        <ax:td label='검색조건 1' width="300px">
+                            <input type="text" class="form-control" />
+                        </ax:td>
+                        <ax:td label='검색조건 2' width="300px">
+                            <input type="text" class="form-control" />
                         </ax:td>
                     </ax:tr>
                 </ax:tbl>
@@ -36,7 +41,7 @@
                 <div class="ax-button-group" data-fit-height-aside="grid-view-01">
                     <div class="left">
                         <h2><i class="cqc-list"></i>
-                            객실 목록 </h2>
+                            프로그램 목록 </h2>
                     </div>
                     <div class="right">
                         <button type="button" class="btn btn-default" data-grid-view-01-btn="add"><i class="cqc-circle-with-plus"></i> 추가</button>
