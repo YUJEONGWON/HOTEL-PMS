@@ -42,7 +42,7 @@ public class GuestInfoService extends BaseService<GuestInfo, Long> {
                 .where(builder)
                 .orderBy(qGuestInfo.guestNm.asc())
                 .fetch();
-/////////////////? new 부분분
+
        return entitis.stream()
                 .map(GuestFindResponseDto::new)
                 .collect(Collectors.toList());

@@ -33,19 +33,9 @@
             <button type="button" class="btn btn-fn1" data-page-btn="delete"> 삭제 </button>
         </ax:page-buttons>
 
-        <ax:split-layout name="ax1" orientation="horizontal">
+        <ax:split-layout name="ax1" orientation="vertical">
             <ax:split-panel width="*" style="padding-right: 0px;">
-                <!-- 목록 -->
-                <div class="ax-button-group" data-fit-height-aside="grid-view-01">
-                    <div class="left">
-                        <h2><i class="cqc-list"></i> 투숙객 목록</h2>
-                    </div>
-                    <div class="right">
-                    </div>
-                </div>
-                <div data-ax5grid="grid-view-01" data-fit-height-content="grid-view-01" ></div>
-            </ax:split-panel>
-            <ax:split-panel>           
+
                 <form name="form" class="js-form" onsubmit="return false;">
                     <div data-ax-tbl class="ax-form-tbl">
 

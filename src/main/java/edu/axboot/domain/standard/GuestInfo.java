@@ -60,10 +60,6 @@ public class GuestInfo extends SimpleJpaModel<Long> {
 	private String rmk;
 
 ////////////??????????
-	public GuestInfo() {
-
-
-	}
 
 
 	@Override

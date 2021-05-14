@@ -1,7 +1,9 @@
 package edu.axboot.controllers.dto;
 
 import edu.axboot.domain.standard.GuestInfo;
+import lombok.Getter;
 
+@Getter
 public class GuestFindResponseDto {
 
     private Long id;

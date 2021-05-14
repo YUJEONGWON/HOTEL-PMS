@@ -3,10 +3,11 @@ var ACTIONS = axboot.actionExtend(fnObj, {
     PAGE_SEARCH: function (caller, act, data) {
         axboot.ajax({
             type: 'GET',
-            url: ['samples', 'parent'],
+            url: '/api/v1/standard/roominfo',
             data: caller.searchView.getData(),
             callback: function (res) {
                 caller.gridView01.setData(res);
+                caller.gridView02.setData(res);
             },
             options: {
                 // axboot.ajax 함수에 2번째 인자는 필수가 아닙니다. ajax의 옵션을 전달하고자 할때 사용합니다.
@@ -24,7 +25,7 @@ var ACTIONS = axboot.actionExtend(fnObj, {
 
         axboot.ajax({
             type: 'PUT',
-            url: ['samples', 'parent'],
+            url: '/api/v1/standard/roominfo',
             data: JSON.stringify(saveList),
             callback: function (res) {
                 ACTIONS.dispatch(ACTIONS.PAGE_SEARCH);
@@ -55,6 +56,7 @@ fnObj.pageStart = function () {
     this.pageButtonView.initView();
     this.searchView.initView();
     this.gridView01.initView();
+    this.gridView02.initView();
 
     ACTIONS.dispatch(ACTIONS.PAGE_SEARCH);
 };
@@ -148,12 +150,13 @@ fnObj.gridView01 = axboot.viewExtend(axboot.gridView, {
             multipleSelect: true,
             target: $('[data-ax5grid="grid-view-01"]'),
             columns: [
-                { key: 'key', label: 'KEY', width: 160, align: 'left', editor: 'text' },
-                { key: 'value', label: 'VALUE', width: 350, align: 'left', editor: 'text' },
-                { key: 'etc1', label: 'ETC1', width: 100, align: 'center', editor: 'text' },
-                { key: 'etc2', label: 'ETC2', width: 100, align: 'center', editor: 'text' },
-                { key: 'etc3', label: 'ETC3', width: 100, align: 'center', editor: 'text' },
-                { key: 'etc4', label: 'ETC4', width: 100, align: 'center', editor: 'text' },
+                { key: 'roomNum', label: '객실번호', width: 100, align: 'left', editor: 'text' },
+                { key: 'roomTypCd', label: '객실타입', width: 100, align: 'left', editor: 'text' },
+                { key: 'dndYn', label: 'DND 여부', width: 100, align: 'left', editor: 'text' },
+                { key: 'ebYn', label: 'ExBed 여부', width: 100, align: 'center', editor: 'text' },
+                { key: 'roomSttusCd', label: '객실상태', width: 100, align: 'center', editor: 'text' },
+                { key: 'clnSttusCd', label: '청소상태', width: 100, align: 'center', editor: 'text' },
+                { key: 'svcSttusCd', label: '서비스상태', width: 100, align: 'center', editor: 'text' },
             ],
             body: {
                 onClick: function () {
@@ -168,6 +171,50 @@ fnObj.gridView01 = axboot.viewExtend(axboot.gridView, {
             },
             delete: function () {
                 ACTIONS.dispatch(ACTIONS.ITEM_DEL);
+            },
+        });
+    },
+    getData: function (_type) {
+        var list = [];
+        var _list = this.target.getList(_type);
+
+        if (_type == 'modified' || _type == 'deleted') {
+            list = ax5.util.filter(_list, function () {
+                delete this.deleted;
+                return this.key;
+            });
+        } else {
+            list = _list;
+        }
+        return list;
+    },
+    addRow: function () {
+        this.target.addRow({ __created__: true }, 'last');
+    },
+});
+
+fnObj.gridView02 = axboot.viewExtend(axboot.gridView, {
+    initView: function () {
+        var _this = this;
+
+        this.target = axboot.gridBuilder({
+            showRowSelector: true,
+            frozenColumnIndex: 0,
+            multipleSelect: true,
+            target: $('[data-ax5grid="grid-view-02"]'),
+            columns: [
+                { key: 'roomNum', label: '객실번호', width: 100, align: 'left', editor: 'text' },
+                { key: 'roomTypCd', label: '객실타입', width: 100, align: 'left', editor: 'text' },
+                { key: 'dndYn', label: 'DND 여부', width: 100, align: 'left', editor: 'text' },
+                { key: 'ebYn', label: 'ExBed 여부', width: 100, align: 'center', editor: 'text' },
+                { key: 'roomSttusCd', label: '객실상태', width: 100, align: 'center', editor: 'text' },
+                { key: 'clnSttusCd', label: '청소상태', width: 100, align: 'center', editor: 'text' },
+                { key: 'svcSttusCd', label: '서비스상태', width: 100, align: 'center', editor: 'text' },
+            ],
+            body: {
+                onClick: function () {
+                    this.self.select(this.dindex, { selectedClear: true });
+                },
             },
         });
     },

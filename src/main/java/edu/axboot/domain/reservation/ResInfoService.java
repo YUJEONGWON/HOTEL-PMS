@@ -21,7 +21,9 @@ public class ResInfoService extends BaseService<ResInfo, Long> {
         return findAll();
     }
 
-
+    public void saveRes(ResInfo entity){
+        this.resInfoRepository.save(entity);
+    }
 
 
 }

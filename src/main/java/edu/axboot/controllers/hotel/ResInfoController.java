@@ -28,7 +28,7 @@ public class ResInfoController extends BaseController {
     }
 
     @RequestMapping(method = {RequestMethod.PUT}, produces = APPLICATION_JSON)
-    public ApiResponse save(@RequestBody List<ResInfo> request) {
+    public ApiResponse save(@RequestBody ResInfo request) {
         resInfoService.save(request);
         return ok();
     }

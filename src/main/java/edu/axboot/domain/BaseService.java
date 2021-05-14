@@ -5,6 +5,7 @@ import edu.axboot.domain.education.book.QEducationBook;
 import edu.axboot.domain.file.QCommonFile;
 import edu.axboot.domain.program.QProgram;
 import edu.axboot.domain.program.menu.QMenu;
+import edu.axboot.domain.reservation.QResInfo;
 import edu.axboot.domain.standard.QGuestInfo;
 import edu.axboot.domain.standard.QRoomInfo;
 import edu.axboot.domain.user.QUser;
@@ -33,6 +34,7 @@ public class BaseService<T, ID extends Serializable> extends AXBootBaseService<T
     protected QEducationTeach qEducationTeach = QEducationTeach.educationTeach;
     protected QEducationBook qEducationBook = QEducationBook.educationBook;
     protected QRoomInfo qRoomInfo = QRoomInfo.roomInfo;
+    protected QResInfo qResInfo = QResInfo.resInfo;
     protected QGuestInfo qGuestInfo = QGuestInfo.guestInfo;
 
     protected AXBootJPAQueryDSLRepository<T, ID> repository;
