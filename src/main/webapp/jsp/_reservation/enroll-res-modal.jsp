@@ -4,7 +4,9 @@
 <%@ taglib prefix="ax" tagdir="/WEB-INF/tags" %>
 <%
     RequestUtils requestUtils = RequestUtils.of(request);
-    request.setAttribute("id", requestUtils.getString("id"));
+    request.setAttribute("guestNm", requestUtils.getString("guestNm"));
+    request.setAttribute("guestTel", requestUtils.getString("guestTel"));
+    request.setAttribute("email", requestUtils.getString("email"));
 %>
 <ax:set key="title" value="${pageName}"/>
 <ax:set key="page_desc" value="${PAGE_REMARK}"/>
@@ -15,125 +17,105 @@
     <jsp:attribute name="script">
         <ax:script-lang key="ax.script" var="LANG" />
         <script>
-            var modalParams = {id: "${id}"};
+            var modalParams = {guestNm: "${guestNm}",guestTel: "${guestTel}",email: "${email}"};
         </script>
-        <script type="text/javascript" src="<c:url value='/assets/js/view/_education/teach-grid-modal-content.js' />"></script>
+        <script type="text/javascript" src="<c:url value='/assets/js/view/_reservation/enroll-res-modal.js' />"></script>
     </jsp:attribute>
     <jsp:attribute name="header">
-        <h1 class="title">
+        <h2 class="title">
             <i class="cqc-browser"></i>
-            실습용 모달 등록
-        </h1>
+            투숙객목록
+        </h2>
     </jsp:attribute>
     <jsp:body>
 
-        <ax:page-buttons>
-            <button type="button" class="btn btn-default" data-page-btn="close"> 닫기 </button>
-            <button type="button" class="btn btn-info" data-page-btn="save"> 저장 </button>
-            <button type="button" class="btn btn-fn1" data-page-btn="delete"> 삭제 </button>
-        </ax:page-buttons>
 
-        <ax:split-layout name="ax1" orientation="vertical">
-            <ax:split-panel width="*" style="padding-right: 0px;">
+        <ax:split-layout name="ax1" orientation="horizontal">
+            <ax:split-panel width="*" height="50%"  style="padding-right: 0px;">
 
+            
+                <div data-ax-tr>
+                    <div data-ax-td style="width:100%">                                          
+                            <div data-ax5grid="grid-view-01" onsubmit="return false" data-fit-height-content="grid-view-01" style="height: 300px;"></div>                                     
+                    </div>>
+                </div>
+    
+
+            </ax:split-panel>
+            
+            <ax:split-panel width="*"  height="50%" style="padding-right: 0px;">
+            
                 <form name="form" class="js-form" onsubmit="return false;">
                     <div data-ax-tbl class="ax-form-tbl">
 
                         <div data-ax-tr>
-                            <div data-ax-td style="width:50%">
-                                <div data-ax-td-label style="width:120px;">ID</div>
+                            <div data-ax-td style="width:40%">
+                                <div data-ax-td-label style="width:120px;">이름</div>
                                 <div data-ax-td-wrap>
-                                    <input type="text" name="id" data-ax-path="id" class="form-control" readonly="readonly">
+                                    <input type="text" name="guestNm" data-ax-path="guestNm" class="form-control">
                                 </div>
                             </div>
-                            <div data-ax-td style="width:50%">
-                                <div data-ax-td-label style="width:120px;">사용여부</div>
+                            <div data-ax-td style="width:60%">
+                                <div data-ax-td-label style="width:120px;">영문</div>
                                 <div data-ax-td-wrap>
-                                    <select name="useYn" data-ax-path="useYn" class="form-control">
-                                        <option value="Y">사용</option>
-                                        <option value="N">미사용</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div data-ax-tr>
-                            <div data-ax-td style="width:50%">
-                                <div data-ax-td-label style="width:120px;">회사명</div>
-                                <div data-ax-td-wrap>
-                                    <input type="text" name="companyNm" data-ax-path="companyNm" title="회사명" class="form-control" data-ax-validate="required" />
-                                </div>
-                            </div>
-                            <div data-ax-td style="width:50%">
-                                <div data-ax-td-label style="width:120px;">대표자</div>
-                                <div data-ax-td-wrap>
-                                    <input type="text" name="ceo" data-ax-path="ceo" class="form-control" />
+                                    <input type="text" name="guestNmEng" data-ax-path="guestNmEng" class="form-control" >
+                                
                                 </div>
                             </div>
                         </div>
 
                         <div data-ax-tr>
-                            <div data-ax-td style="width:50%">
-                                <div data-ax-td-label style="width:120px;">사업자번호</div>
+                            <div data-ax-td style="width:40%">
+                                <div data-ax-td-label style="width:120px;">연락처</div>
                                 <div data-ax-td-wrap>
-                                    <input type="text" name="bizno" data-ax-path="bizno" title="사업자번호" data-ax5formatter="bizno" class="form-control" placeholder="000-00-00000" />
+                                    <input type="text" name="guestTel" data-ax-path="guestTel"  class="form-control"/>
                                 </div>
                             </div>
-                            <div data-ax-td style="width:50%">
-                                <div data-ax-td-label style="width:120px;">전화번호</div>
-                                <div data-ax-td-wrap>
-                                    <input type="text" name="tel" data-ax-path="tel" class="form-control" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div data-ax-tr>
-                            <div data-ax-td style="width:50%">
+                            <div data-ax-td style="width:60%">
                                 <div data-ax-td-label style="width:120px;">이메일</div>
                                 <div data-ax-td-wrap>
-                                    <input type="text" name="email" data-ax-path="email" class="form-control inline-block" placeholder="x@x.xx" />
-                                </div>
-                            </div>
-                            <div data-ax-td style="width:50%">
-                                <div data-ax-td-label style="width:120px;">우편번호</div>
-                                <div data-ax-td-wrap>
-                                    <input type="text" name="zip" data-ax-path="zip" class="form-control" />
+                                    <input type="text" name="email" data-ax-path="email" class="form-control" />
                                 </div>
                             </div>
                         </div>
 
                         <div data-ax-tr>
-                            <div data-ax-td style="width:100%">
-                                <div data-ax-td-label style="width:120px;">주소</div>
+                            <div data-ax-td style="width:40%">
+                                <div data-ax-td-label style="width:120px;">언어</div>
                                 <div data-ax-td-wrap>
-                                    <input type="text" name="address" data-ax-path="address" class="form-control" />
+                                    <ax:common-code groupCd="PMS_LANG" name="langCd" clazz="js-langCd"  emptyText="전체"/>
+                                </div>
+                            </div>
+                            <div data-ax-td style="width:60%">
+                                <div data-ax-td-label style="width:120px;">생년월일</div>
+                                <div data-ax-td-wrap>
+                                    <input type="date" style="display:inline-block;"  data-ax-path="brth" class="form-control W100" name="brth" >
+                                    <input type="radio" name="gender" data-ax-path="gender" value="남"> 남
+                                    <input type="radio" name="gender" data-ax-path="gender" value="여"> 여
                                 </div>
                             </div>
                         </div>
-
+                        
                         <div data-ax-tr>
-                            <div data-ax-td style="width:100%">
-                                <div data-ax-td-label style="width:120px;">상세 주소</div>
-                                <div data-ax-td-wrap>
-                                    <input type="text" name="addressDetail" data-ax-path="addressDetail" class="form-control" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div data-ax-tr>
-                            <div data-ax-td style="width:100%">
+                            <div data-ax-td >
                                 <div data-ax-td-label style="width:120px;">비고</div>
                                 <div data-ax-td-wrap>
-                                    <textarea name="remark" data-ax-path="remark" rows="5" class="form-control"></textarea>
+                                    <textarea name="rmk" data-ax-path="rmk" rows="5" style="width:100%"class="form-control"></textarea>
+                                       
                                 </div>
                             </div>
+                            
                         </div>
+                      
 
                     </div>
                 </form>
-
             </ax:split-panel>
         </ax:split-layout>
-
+        
+        <ax:page-buttons>
+            <button type="button" class="btn btn-default" data-page-btn="close"> 닫기 </button>
+            <button type="button" class="btn btn-info" data-page-btn="choice"> 선택 </button>
+        </ax:page-buttons>
     </jsp:body>
 </ax:layout>

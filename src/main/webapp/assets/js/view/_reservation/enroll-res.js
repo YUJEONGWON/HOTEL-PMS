@@ -2,12 +2,9 @@ var fnObj = {};
 var ACTIONS = axboot.actionExtend(fnObj, {
     //투숙메모 search
     PAGE_SEARCH: function (caller, act, data) {
-        var paramObj = $.extend(caller.searchView.getData(), data);
-
         axboot.ajax({
             type: 'GET',
-            url: '/api/v1/standard/roomInfo',
-            data: paramObj,
+            url: '/api/v1/standard/roominfo',
             callback: function (res) {
                 caller.gridView01.setData(res);
             },
@@ -21,36 +18,34 @@ var ACTIONS = axboot.actionExtend(fnObj, {
 
         return false;
     },
+    PAGE_SAVE: function (caller, act, data) {
+        var item = caller.formView01.getData();
+        if (!item.id) item.__created__ = true;
+        axboot.ajax({
+            type: 'POST',
+            url: '/api/v1/chk/',
+            data: JSON.stringify(item),
+            callback: function (res) {
+                axToast.push('저장 되었습니다');
+                ACTIONS.dispatch(ACTIONS.PAGE_SEARCH);
+            },
+        });
+    },
 
     MODAL_OPEN: function (caller, act, data) {
-        // var item = caller.searchView.getData();
-
-        // if (!item.guestNm) {
-        //     axDialog.alert('이름은 필수입니다.');
-        //     return false;
-        // }
-        // axboot.ajax({
-        //     type: 'GET',
-        //     url: '/api/v1/standar/guestInfo',
-        //     data: JSON.stringify(item),
-        //     callback: function (res) {
-        //         caller.formView01.setData(res);
-        //     },
-        // });
-
         if (!data) data = {};
 
         axboot.modal.open({
             width: 780,
             height: 450,
             iframe: {
-                param: 'id=' + (data.id || ''),
+                param: 'guestNm=' + (data.guestNm || '') + '&guestTel=' + (data.guestTel || '') + '&email=' + (data.email || ''),
                 url: 'enroll-res-modal.jsp',
             },
             header: { title: '모달등록' },
             callback: function (data) {
-                if (data && data.dirty) {
-                    ACTIONS.dispatch(ACTIONS.PAGE_SEARCH);
+                if (data) {
+                    caller.formView01.setGuest(data);
                 }
                 this.close();
             },
@@ -70,9 +65,8 @@ var ACTIONS = axboot.actionExtend(fnObj, {
 // fnObj 기본 함수 스타트와 리사이즈
 fnObj.pageStart = function () {
     this.pageButtonView.initView();
-    this.searchView.initView();
+    this.formView01.initView();
     this.gridView01.initView();
-
     ACTIONS.dispatch(ACTIONS.PAGE_SEARCH);
 };
 
@@ -95,9 +89,104 @@ fnObj.pageButtonView = axboot.viewExtend({
 /**
  * searchView
  */
-fnObj.searchView = axboot.viewExtend(axboot.searchView, {
+fnObj.formView01 = axboot.viewExtend(axboot.formView, {
+    getDefaultData: function () {
+        return {};
+    },
+    getData: function () {
+        var data = this.modelFormatter.getClearData(this.model.get()); // 모델의 값을 포멧팅 전 값으로 치환.
+        return $.extend({}, data);
+    },
+    setData: function (data) {
+        if (typeof data === 'undefined') data = this.getDefaultData();
+        data = $.extend({}, data);
+
+        this.model.setModel(data);
+        this.modelFormatter.formatting(); // 입력된 값을 포메팅 된 값으로 변경
+    },
+    setGuest: function (data) {
+        this.model.set('guestNm', data.guestNm || '');
+        this.model.set('guestNmEng', data.guestNmEng || '');
+        this.model.set('guestTel', data.guestTel || '');
+        this.model.set('email', data.email || '');
+        this.model.set('langCd', data.langCd || '');
+        this.model.set('brth', data.brth || '');
+        this.model.set('gender', data.gender || '');
+    },
+    validate: function () {
+        var item = this.model.get();
+
+        var rs = this.model.validate();
+
+        if (rs.error) {
+            alert(rs.error[0].jquery.attr('title') + '을(를) 입력해주세요.');
+            rs.error[0].jquery.focus();
+            return false;
+        }
+
+        return true;
+    },
+    getSearchData: function () {
+        return {
+            guestNm: this.guestNm.val(),
+            guestTel: this.guestTel.val(),
+            email: this.email.val(),
+        };
+    },
+    initEvent: function () {
+        var _this = this;
+        axboot.buttonClick(this, 'data-form-view-01-btn', {
+            'form-clear': function () {
+                ACTIONS.dispatch(ACTIONS.FORM_CLEAR);
+            },
+        });
+
+        this.arrDt.on('change', function () {
+            var arrDt = $(this).val();
+            var depDt = _this.depDt.val();
+            if (!arrDt || !depDt) return;
+            var momArrDt = moment(arrDt);
+            var momDepDt = moment(depDt);
+            var nightCnt = momDepDt.diff(momArrDt, 'days');
+            if (nightCnt < 1) {
+                nightCnt = 1;
+                _this.model.set('depDt', momArrDt.add(nightCnt, 'days').format('yyyy-MM-DD'));
+            }
+            _this.model.set('nightCnt', nightCnt);
+        });
+        this.depDt.on('change', function () {
+            var arrDt = _this.arrDt.val();
+            var depDt = $(this).val();
+            if (!arrDt || !depDt) return;
+            var momArrDt = moment(arrDt);
+            var momDepDt = moment(depDt);
+            var nightCnt = momDepDt.diff(momArrDt, 'days');
+            if (nightCnt < 1) {
+                nightCnt = 1;
+                _this.model.set('arrDt', momDepDt.add(-nightCnt, 'days').format('yyyy-MM-DD'));
+            }
+            _this.model.set('nightCnt', nightCnt);
+        });
+        this.nightCnt.on('change', function () {
+            var arrDt = _this.arrDt.val();
+            if (!arrDt) return;
+            var nightCnt = _this.nightCnt.val();
+            if (nightCnt < 1) {
+                nightCnt = 1;
+                _this.model.set('nightCnt', nightCnt);
+            }
+            _this.model.set('depDt', moment(arrDt).add(nightCnt, 'days').format('yyyy-MM-DD'));
+        });
+    },
     initView: function () {
-        this.target = $(document['searchView0']);
+        var _this = this; // fnObj.formView01
+
+        _this.target = $('.js-form');
+
+        this.model = new ax5.ui.binder();
+        this.model.setModel(this.getDefaultData(), this.target);
+        this.modelFormatter = new axboot.modelFormatter(this.model); // 모델 포메터 시작
+
         // this.target.attr('onsubmit', 'return ACTIONS.dispatch(ACTIONS.PAGE_SEARCH);');
 
         this.guestNm = $('.js-guestNm');
@@ -106,17 +195,55 @@ fnObj.searchView = axboot.viewExtend(axboot.searchView, {
 
         axboot.buttonClick(this, 'data-search-view-01-btn', {
             search: function () {
-                // ACTIONS.dispatch(ACTIONS.MODAL_OPEN,this.item);ACTIONS.dispatch(ACTIONS.MODAL_OPEN,this.item);
-                ACTIONS.dispatch(ACTIONS.MODAL_OPEN);
+                ACTIONS.dispatch(ACTIONS.MODAL_OPEN, {
+                    guestNm: this.guestNm.val(),
+                    guestTel: this.guestTel.val(),
+                    email: this.email.val(),
+                });
             },
         });
-    },
-    getData: function () {
-        return {
-            guestNm: this.guestNm.val(),
-            guestTel: this.guestTel.val(),
-            email: this.email.val(),
-        };
+
+        function createPicker(target) {
+            return new ax5.ui.picker().bind(
+                (pickerDefault = {
+                    target: target,
+                    direction: 'top',
+                    content: {
+                        width: 270,
+                        margin: 10,
+                        type: 'date',
+                        config: {
+                            lang: {
+                                yearTmpl: '%s년',
+                                months: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
+                                dayTmpl: '%s',
+                            },
+                        },
+                        formatter: {
+                            pattern: 'date',
+                        },
+                    },
+                    onStateChanged: function () {
+                        if (this.state == 'open') {
+                            //console.log(this.item);
+                            var selectedValue = this.self.getContentValue(this.item['$target']);
+                            if (!selectedValue) {
+                                this.item.pickerCalendar[0].ax5uiInstance.setSelection([ax5.util.date(new Date(), { add: { d: 1 } })]);
+                            }
+                        }
+                    },
+                })
+            );
+        }
+
+        createPicker($('[data-ax5picker="arrDt"]'));
+        createPicker($('[data-ax5picker="depDt"]'));
+
+        this.arrDt = $('[data-ax-path="arrDt"]');
+        this.depDt = $('[data-ax-path="depDt"]');
+        this.nightCnt = $('[data-ax-path="nightCnt"]');
+
+        this.initEvent();
     },
 });
 

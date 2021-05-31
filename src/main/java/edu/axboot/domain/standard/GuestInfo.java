@@ -1,25 +1,26 @@
 package edu.axboot.domain.standard;
 
 import com.chequer.axboot.core.annotations.ColumnPosition;
+import edu.axboot.domain.BaseJpaModel;
 import edu.axboot.domain.SimpleJpaModel;
+import edu.axboot.domain.reservation.Chk;
 import lombok.*;
 import org.apache.ibatis.type.Alias;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import com.chequer.axboot.core.annotations.Comment;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import javax.persistence.*;
+import java.util.List;
 
 
-@Setter
 @Getter
-@DynamicInsert
-@DynamicUpdate
+@NoArgsConstructor
 @Entity
-@EqualsAndHashCode(callSuper = true)
 @Table(name = "PMS_GUEST")
-@Comment(value = "")
-@Alias("guestInfo")
-public class GuestInfo extends SimpleJpaModel<Long> {
+public class GuestInfo extends BaseJpaModel<Long> {
 
 	@Id
 	@Column(name = "ID", precision = 19, nullable = false)
@@ -59,13 +60,32 @@ public class GuestInfo extends SimpleJpaModel<Long> {
 	@Comment(value = "비고")
 	private String rmk;
 
-////////////??????????
-
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "GUEST_ID", referencedColumnName = "ID", insertable = false, updatable = false)
+	private List<Chk> chkList;
 
 	@Override
-    public Long getId() {
-        return id;
-    }
+	public Long getId() {
+		return id;
+	}
 
+	@Builder
+	public GuestInfo(Long id, String guestNm, String guestNmEng, String guestTel, String email, String brth, String gender, String langCd, String rmk) {
+		this.id = id;
+		this.guestNm = guestNm;
+		this.guestNmEng = guestNmEng;
+		this.guestTel = guestTel;
+		this.email = email;
+		this.brth = brth;
+		this.gender = gender;
+		this.langCd = langCd;
+		this.rmk = rmk;
+	}
 
+	public void update(String guestTel, String email, String rmk) {
+		this.guestTel = guestTel;
+		this.email = email;
+		this.rmk = rmk;
+	}
 }

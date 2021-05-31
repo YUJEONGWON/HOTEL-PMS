@@ -3,7 +3,7 @@ var ACTIONS = axboot.actionExtend(fnObj, {
     PAGE_SEARCH: function (caller, act, data) {
         axboot.ajax({
             type: 'GET',
-            url: '/api/v1/standard/roominfo',
+            url: '/api/v1/chk',
             data: caller.searchView.getData(),
             callback: function (res) {
                 caller.gridView01.setData(res);
@@ -19,12 +19,12 @@ var ACTIONS = axboot.actionExtend(fnObj, {
         return false;
     },
     PAGE_SAVE: function (caller, act, data) {
-        var saveList = [].concat(caller.gridView01.getData('modified'));
+        var saveList = [].concat(caller.gridView01.getData());
         saveList = saveList.concat(caller.gridView01.getData('deleted'));
 
         axboot.ajax({
             type: 'PUT',
-            url: ['samples', 'parent'],
+            url: '/api/v1/chk',
             data: JSON.stringify(saveList),
             callback: function (res) {
                 ACTIONS.dispatch(ACTIONS.PAGE_SEARCH);
@@ -107,13 +107,98 @@ fnObj.gridView01 = axboot.viewExtend(axboot.gridView, {
             multipleSelect: true,
             target: $('[data-ax5grid="grid-view-01"]'),
             columns: [
-                { key: 'roomNum', label: '객실번호', width: 100, align: 'left', editor: 'text' },
-                { key: 'roomTypCd', label: '객실타입', width: 100, align: 'left', editor: 'text' },
-                { key: 'dndYn', label: 'DND 여부', width: 100, align: 'left', editor: 'text' },
-                { key: 'ebYn', label: 'ExBed 여부', width: 100, align: 'center', editor: 'text' },
-                { key: 'roomSttusCd', label: '객실상태', width: 100, align: 'center', editor: 'text' },
-                { key: 'clnSttusCd', label: '청소상태', width: 100, align: 'center', editor: 'text' },
-                { key: 'svcSttusCd', label: '서비스상태', width: 100, align: 'center', editor: 'text' },
+                { key: 'id', label: '아이디', width: 100, align: 'center', editor: 'text' },
+                { key: 'sno', label: '일련번호', width: 100, align: 'center', editor: 'text' },
+                { key: 'guestId', label: '투숙객아이디', width: 100, align: 'center', editor: 'text' },
+                { key: 'adultCnt', label: '성인수', width: 100, align: 'center', editor: 'text' },
+                { key: 'chldCnt', label: '아동수', width: 100, align: 'center', editor: 'text' },
+                { key: 'advnYn', label: '선수금여부', width: 100, align: 'left', editor: 'text' },
+                { key: 'rsvNum', label: '예약번호', width: 100, align: 'left', editor: 'text' },
+                { key: 'rsvDt', label: '예약일', width: 100, align: 'left', editor: 'text' },
+                { key: 'guestNm', label: '투숙객', width: 100, align: 'left', editor: 'text' },
+                {
+                    key: 'roomTypCd',
+                    label: '객실타입',
+                    width: 100,
+                    align: 'center',
+                    editor: {
+                        type: 'select',
+                        config: {
+                            columnKeys: {
+                                optionValue: 'code',
+                                optionText: 'name',
+                            },
+                            options: parent.COMMON_CODE['PMS_ROOM_TYPE'],
+                        },
+                    },
+                    formatter: function () {
+                        if (!this.value) return '';
+                        return parent.COMMON_CODE['PMS_ROOM_TYPE'].map[this.value];
+                    },
+                },
+                { key: 'roomNum', label: '객실번호', width: 100, align: 'center', editor: 'text' },
+                { key: 'arrDt', label: '도착일', width: 100, align: 'center', editor: 'text' },
+                { key: 'depDt', label: '출발일', width: 100, align: 'center', editor: 'text' },
+                {
+                    key: 'srcCd',
+                    label: '예약경로',
+                    width: 100,
+                    align: 'center',
+                    editor: {
+                        type: 'select',
+                        config: {
+                            columnKeys: {
+                                optionValue: 'code',
+                                optionText: 'name',
+                            },
+                            options: parent.COMMON_CODE['PMS_RESERVATION_ROUTE'],
+                        },
+                    },
+                    formatter: function () {
+                        if (!this.value) return '';
+                        return parent.COMMON_CODE['PMS_RESERVATION_ROUTE'].map[this.value];
+                    },
+                },
+                {
+                    key: 'saleTypCd',
+                    label: '판매유형',
+                    width: 100,
+                    align: 'center',
+                    editor: {
+                        type: 'select',
+                        config: {
+                            columnKeys: {
+                                optionValue: 'code',
+                                optionText: 'name',
+                            },
+                            options: parent.COMMON_CODE['PMS_SALE_TYPE'],
+                        },
+                    },
+                    formatter: function () {
+                        if (!this.value) return '';
+                        return parent.COMMON_CODE['PMS_SALE_TYPE'].map[this.value];
+                    },
+                },
+                {
+                    key: 'sttusCd',
+                    label: '상태',
+                    width: 100,
+                    align: 'center',
+                    editor: {
+                        type: 'select',
+                        config: {
+                            columnKeys: {
+                                optionValue: 'code',
+                                optionText: 'name',
+                            },
+                            options: parent.COMMON_CODE['PMS_STAY_STATUS'],
+                        },
+                    },
+                    formatter: function () {
+                        if (!this.value) return '';
+                        return parent.COMMON_CODE['PMS_STAY_STATUS'].map[this.value];
+                    },
+                },
             ],
             body: {
                 onClick: function () {

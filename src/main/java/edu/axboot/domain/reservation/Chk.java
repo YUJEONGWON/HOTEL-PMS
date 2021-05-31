@@ -1,23 +1,29 @@
 package edu.axboot.domain.reservation;
 
-import com.chequer.axboot.core.annotations.ColumnPosition;
+import com.chequer.axboot.core.annotations.Comment;
+import edu.axboot.domain.BaseJpaModel;
 import edu.axboot.domain.SimpleJpaModel;
-import lombok.*;
-import org.apache.ibatis.type.Alias;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import com.chequer.axboot.core.annotations.Comment;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.List;
+
 
 @Setter
 @Getter
-@DynamicInsert
-@DynamicUpdate
+@NoArgsConstructor
 @Entity
 @Table(name = "PMS_CHK")
-@Alias("resInfo")
-public class ResInfo extends SimpleJpaModel<Long> {
+public class Chk extends BaseJpaModel<Long> {
 
 	@Id
 	@Column(name = "ID", precision = 19, nullable = false)
@@ -134,8 +140,92 @@ public class ResInfo extends SimpleJpaModel<Long> {
 	private BigDecimal svcPrc;
 
 
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "RSV_NUM", referencedColumnName = "RSV_NUM", insertable = false, updatable = false)
+	private List<ChkMemo> memos;
+
+
     @Override
     public Long getId() {
         return id;
     }
+
+	@Builder
+	public Chk(Long id, String rsvDt, Integer sno, String rsvNum,
+			   Long guestId, String guestNm, String guestNmEng, String guestTel, String email, String langCd,
+			   String arrDt, String arrTime, String depDt, String depTime, Integer nightCnt, String roomTypCd, String roomNum,
+			   Integer adultCnt, Integer chldCnt, String saleTypCd, String sttusCd, String srcCd,
+			   String brth, String gender, String payCd, String advnYn, BigDecimal salePrc, BigDecimal svcPrc) {
+
+		this.id = id;
+		this.rsvDt = rsvDt;
+		this.sno = sno;
+		this.rsvNum = rsvNum;
+		this.guestId = guestId;
+		this.guestNm = guestNm;
+		this.guestNmEng = guestNmEng;
+		this.guestTel = guestTel;
+		this.email = email;
+		this.langCd = langCd;
+		this.arrDt = arrDt;
+		this.arrTime = arrTime;
+		this.depDt = depDt;
+		this.depTime = depTime;
+		this.nightCnt = nightCnt;
+		this.roomTypCd = roomTypCd;
+		this.roomNum = roomNum;
+		this.adultCnt = adultCnt;
+		this.chldCnt = chldCnt;
+		this.saleTypCd = saleTypCd;
+		this.sttusCd = sttusCd;
+		this.srcCd = srcCd;
+		this.brth = brth;
+		this.gender = gender;
+		this.payCd = payCd;
+		this.advnYn = advnYn;
+		this.salePrc = salePrc;
+		this.svcPrc = svcPrc;
+	}
+
+	public void 예약번호생성(String rsvDt, int sno) {
+		this.rsvDt = rsvDt;
+		this.sno = sno;
+		this.rsvNum = "R" + rsvDt.replaceAll("-", "") + StringUtils.leftPad(Integer.toString(sno), 3, '0');
+		this.sttusCd = "RSV";
+	}
+
+	public void 투숙객번호갱신(Long guestId) {
+		this.guestId = guestId;
+	}
+
+	public void 예약수정(Long guestId, String guestNm, String guestNmEng, String guestTel, String email, String brth, String gender, String langCd,
+					 String arrDt, String depDt, Integer nightCnt, String roomTypCd, Integer adultCnt, Integer chldCnt,
+					 String saleTypCd, String srcCd, String payCd, String advnYn, BigDecimal salePrc, BigDecimal svcPrc) {
+		this.guestId = guestId;
+		this.guestNm = guestNm;
+		this.guestNmEng = guestNmEng;
+		this.guestTel = guestTel;
+		this.email = email;
+		this.langCd = langCd;
+		this.arrDt = arrDt;
+		this.depDt = depDt;
+		this.nightCnt = nightCnt;
+		this.roomTypCd = roomTypCd;
+		this.adultCnt = adultCnt;
+		this.chldCnt = chldCnt;
+		this.saleTypCd = saleTypCd;
+		this.srcCd = srcCd;
+		this.brth = brth;
+		this.gender = gender;
+		this.payCd = payCd;
+		this.advnYn = advnYn;
+		this.salePrc = salePrc;
+		this.svcPrc = svcPrc;
+	}
+
+	public void 예약상태변경(String sttusCd) {
+		this.sttusCd = sttusCd;
+	}
+
 }

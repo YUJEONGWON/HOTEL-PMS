@@ -5,13 +5,10 @@ import com.chequer.axboot.core.controllers.BaseController;
 import com.chequer.axboot.core.parameter.RequestParams;
 import com.wordnik.swagger.annotations.ApiImplicitParam;
 import com.wordnik.swagger.annotations.ApiImplicitParams;
-import edu.axboot.controllers.dto.GuestFindRequestDto;
-import edu.axboot.controllers.dto.GuestFindResponseDto;
+import edu.axboot.controllers.dto.*;
 import org.springframework.stereotype.Controller;
 import com.chequer.axboot.core.api.response.ApiResponse;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import edu.axboot.domain.standard.GuestInfo;
 import edu.axboot.domain.standard.GuestInfoService;
 
@@ -25,20 +22,35 @@ public class GuestInfoController extends BaseController {
     @Inject
     private GuestInfoService guestInfoService;
 
+
+
     @RequestMapping(method = RequestMethod.GET, produces = APPLICATION_JSON)
-    public Responses.ListResponse list(RequestParams<GuestInfo> requestParams) {
-        List<GuestInfo> list = guestInfoService.gets(requestParams);
+    public Responses.ListResponse list(@RequestParam(value = "guestNm", required = false) String guestNm,
+                                       @RequestParam(value = "guestTel", required = false) String guestTel,
+                                       @RequestParam(value = "email", required = false) String email) {
+        List<GuestListResponseDto> list = guestInfoService.getGuestList(guestNm, guestTel, email);
         return Responses.ListResponse.of(list);
     }
 
-    @RequestMapping(method = {RequestMethod.PUT}, produces = APPLICATION_JSON)
-    public ApiResponse save(@RequestBody List<GuestInfo> request) {
-        guestInfoService.save(request);
+
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = APPLICATION_JSON)
+    public GuestResponseDto findById(@PathVariable Long id) {
+        return guestInfoService.getGuestList(id);
+    }
+
+    @RequestMapping(method = {RequestMethod.POST}, produces = APPLICATION_JSON)
+    public ApiResponse save(@RequestBody GuestSaveRequestDto requestDto) {
+        guestInfoService.save(requestDto);
         return ok();
     }
 
-
-    @ApiImplicitParams({
+    @RequestMapping(method = {RequestMethod.PUT}, produces = APPLICATION_JSON)
+    public ApiResponse update(@RequestBody GuestSaveRequestDto requestDto) {
+        guestInfoService.update(requestDto);
+        return ok();
+    }
+   /* @ApiImplicitParams({
             @ApiImplicitParam(name = "guestNm", value = "이름", required = true, dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "guestTel", value = "전화번호", required = false, dataType = "String", paramType = "query", defaultValue = ""),
             @ApiImplicitParam(name = "email", value = "이메일", dataType = "String", paramType = "query", defaultValue = ""),
@@ -52,5 +64,5 @@ public class GuestInfoController extends BaseController {
 
         List<GuestFindResponseDto> list = guestInfoService.getFindGuestList(guestNm,guestTel,email);
         return list;
-    }
+    }*/
 }
